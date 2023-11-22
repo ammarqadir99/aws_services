@@ -21,10 +21,16 @@ jobs:
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
           echo "::set-output name=tag::$TAG"
 
+      - name: 'Extract File Name'
+        id: extract_file_name
+        run: |
+          FileName=$(ls index.* | head -n 1)
+          echo "fileName=$FileName" >> $GITHUB_OUTPUT
+
       - name: 'Create Zip File'
         id: 'create_package'
         run: |
-          PACKAGE_NAME="${{ steps.generate_tag_version.outputs.tag }}.zip"
+          PACKAGE_NAME="${{ steps.extract_file_name.outputs.fileName }}-${{ steps.generate_tag_version.outputs.tag }}.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           zip -r $PACKAGE_NAME .
 
@@ -51,8 +57,9 @@ jobs:
               ref: 'refs/tags/${{ steps.generate_tag_version.outputs.tag }}',
               sha: context.sha
             })
+
       - name: Repositrory Dispatch
         uses: peter-evans/repository-dispatch@v1
         with:
           event-type: run-deploy
-          client-payload: '{"ref": "$TAG", "sha": "${{ context.sha }}", "test": "deploy message"}'
+          client-payload: '{"ref": "$TAG", "test": "deploy message"}'

@@ -25,7 +25,6 @@ jobs:
           TAG=fileName-$(date +%Y%m%d)-$(date +%H%M%S)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
-          echo "::set-output name=tag::$TAG"
 
       - name: 'Create Zip File'
         id: 'create_package'

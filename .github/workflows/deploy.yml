@@ -4,13 +4,9 @@ on:
   repository_dispatch:
     types: [run-deploy]
 
-  workflow_run:
-    workflows: [Build and upload to S3 Bucket]
-    types:
-      - completed
-
 jobs:
   Deploy:
+    needs: [Build and upload to S3 Bucket]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

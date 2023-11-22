@@ -6,7 +6,6 @@ on:
 
 jobs:
   Deploy:
-    needs: [Build and upload to S3 Bucket]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

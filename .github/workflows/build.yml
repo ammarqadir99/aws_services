@@ -15,14 +15,14 @@ jobs:
       - name: 'Extract File Name'
         id: extract_file_name
         run: |
-          FileName=$(ls *lambda_function* | cut -d'.' -f1)
+          FileName=$(ls *lambda* | cut -d'.' -f1)
           echo "fileName=$FileName" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v3
       - name: 'Generate Tag Version'
         id: generate_tag_version
         run: |
-          TAG=${{ steps.extract_file_name.outputs.fileName }}-$(date +%Y%m%d)-$(date +%H%M%S)
+          TAG=${ steps.extract_file_name.outputs.fileName }-$(date +%Y%m%d)-$(date +%H%M%S)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
           echo "::set-output name=tag::$TAG"

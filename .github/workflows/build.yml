@@ -15,7 +15,7 @@ jobs:
       - name: 'Extract File Name'
         id: extract_file_name
         run: |
-          FileName=$(ls index.* | head -n 1)
+          FileName=$(ls *lambda_function* | cut -d'.' -f1)
           echo "fileName=$FileName" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v3

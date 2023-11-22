@@ -1,6 +1,9 @@
 name: 'Deploy to Lambda Function'
 
 on:
+  repository_dispatch:
+    types: [run-deploy]
+
   workflow_run:
     workflows: [Build and upload to S3 Bucket]
     types:
@@ -18,7 +21,7 @@ jobs:
             const refResponse = await github.rest.git.getRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'tags/${{ inputs.version }}'
+              ref: 'tags/${{ github.event.client_payload.version }}'
             });
 
       - name: 'Configure AWS Credentials'
@@ -32,17 +35,17 @@ jobs:
         run: |
           aws s3api wait object-exists \
             --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} \
-            --key ${{ inputs.version }}.zip \
+            --key ${{ github.event.client_payload.version }}.zip \
             --cli-read-timeout 60 \
             --cli-connect-timeout 60
 
       - name: 'Update Source Code'
         run: |
-          echo "Deploy Version: ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "Update Lambda Function with ${{ inputs.version }}.zip file" >> $GITHUB_STEP_SUMMARY
+          echo "Deploy Version: ${{ github.event.client_payload.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Update Lambda Function with ${{ github.event.client_payload.version }}.zip file" >> $GITHUB_STEP_SUMMARY
           aws lambda update-function-code \
             --function-name=${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
             --s3-bucket=${{ secrets.AWS_S3_BUCKET_NAME }} \
-            --s3-key=${{ inputs.version }}.zip \
+            --s3-key=${{ github.event.client_payload.version }}.zip \
             --cli-read-timeout 60 \
             --cli-connect-timeout 60

@@ -12,25 +12,25 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: 'Generate Tag Version'
-        id: generate_tag_version
-        run: |
-          TAG=$(date +%Y%m%d)-$(date +%H%M%S)
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
-          echo "::set-output name=tag::$TAG"
-
       - name: 'Extract File Name'
         id: extract_file_name
         run: |
           FileName=$(ls index.* | head -n 1)
           echo "fileName=$FileName" >> $GITHUB_OUTPUT
 
+      - uses: actions/checkout@v3
+      - name: 'Generate Tag Version'
+        id: generate_tag_version
+        run: |
+          TAG=${{ steps.extract_file_name.outputs.fileName }}-$(date +%Y%m%d)-$(date +%H%M%S)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
+          echo "::set-output name=tag::$TAG"
+
       - name: 'Create Zip File'
         id: 'create_package'
         run: |
-          PACKAGE_NAME="${{ steps.extract_file_name.outputs.fileName }}-${{ steps.generate_tag_version.outputs.tag }}.zip"
+          PACKAGE_NAME="${{ steps.generate_tag_version.outputs.tag }}.zip"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           zip -r $PACKAGE_NAME .
 
@@ -63,4 +63,4 @@ jobs:
         with:
           token: ${{ secrets.PAT }}
           event-type: run-deploy
-          client-payload: '{"ref": "$TAG", "test": "deploy message"}'
+          client-payload: '{"version": "${{ steps.generate_tag_version.outputs.tag }}", "test": "deploy message"}'

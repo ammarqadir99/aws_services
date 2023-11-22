@@ -61,5 +61,6 @@ jobs:
       - name: Repositrory Dispatch
         uses: peter-evans/repository-dispatch@v1
         with:
+          token: ${{ secrets.PAT }}
           event-type: run-deploy
           client-payload: '{"ref": "$TAG", "test": "deploy message"}'

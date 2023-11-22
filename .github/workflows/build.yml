@@ -19,6 +19,7 @@ jobs:
           TAG=$(date +%Y%m%d)-$(date +%H%M%S)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
+          echo "::set-output name=tag::$TAG"
 
       - name: 'Create Zip File'
         id: 'create_package'
@@ -50,3 +51,8 @@ jobs:
               ref: 'refs/tags/${{ steps.generate_tag_version.outputs.tag }}',
               sha: context.sha
             })
+      - name: Repositrory Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          event-type: run-deploy
+          client-payload: '{"ref": "$TAG", "sha": "${{ context.sha }}", "test": "deploy message"}'

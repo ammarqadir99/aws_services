@@ -22,7 +22,7 @@ jobs:
       - name: 'Generate Tag Version'
         id: generate_tag_version
         run: |
-          TAG=${ steps.extract_file_name.outputs.fileName }-$(date +%Y%m%d)-$(date +%H%M%S)
+          TAG=fileName-$(date +%Y%m%d)-$(date +%H%M%S)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Tag Version: $TAG" >> $GITHUB_STEP_SUMMARY
           echo "::set-output name=tag::$TAG"
